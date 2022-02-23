@@ -14,6 +14,8 @@ using FluentValidation.AspNetCore;
 using FluentValidation;
 using Phonebook.Validators;
 using Phonebook.Models;
+using Phonebook.Data.Repositories.Base;
+using Phonebook.Data.Repositories;
 
 namespace Phonebook
 {
@@ -35,6 +37,7 @@ namespace Phonebook
             services.AddControllersWithViews();
             services.AddFluentValidation();
             services.AddTransient<IValidator<Contact>, ContactValidator>();
+            services.AddScoped<IRepositoryManager, RepositoryManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
