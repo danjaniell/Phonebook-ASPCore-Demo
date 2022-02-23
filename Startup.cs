@@ -27,6 +27,7 @@ namespace Phonebook
         {
             services.AddDbContext<ApplicationDbContext>(opts => opts.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
             services.AddDatabaseDeveloperPageExceptionFilter();
+            services.AddHttpContextAccessor();
             services.AddControllersWithViews();
         }
 
