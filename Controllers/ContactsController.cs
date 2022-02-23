@@ -51,5 +51,44 @@ namespace Phonebook.Controllers
 
             return View(contact);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var exist = await _context.Contacts.Where(x => x.Id == id).FirstOrDefaultAsync();
+
+            return View(exist);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> Edit(Contact request)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var exist = await _context.Contacts.Where(x => x.Id == request.Id).FirstOrDefaultAsync();
+
+                    if (exist is not null)
+                    {
+                        exist.FirstName = request.FirstName;
+                        exist.LastName = request.LastName;
+                        exist.Mobile = request.Mobile;
+                        exist.Email = request.Email;
+
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction("Index");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, $"Something went wrong {ex.Message}");
+                }
+            }
+
+            ModelState.AddModelError(string.Empty, "Something went wrong, invalid model");
+
+            return View(request);
+        }
     }
 }
