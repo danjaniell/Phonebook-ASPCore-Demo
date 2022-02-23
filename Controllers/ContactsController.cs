@@ -60,7 +60,7 @@ namespace Phonebook.Controllers
             return View(exist);
         }
 
-        [HttpPut]
+        [HttpPost]
         public async Task<IActionResult> Edit(Contact request)
         {
             if (ModelState.IsValid)
