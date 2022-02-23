@@ -34,9 +34,10 @@ namespace Phonebook.Data
 
             foreach (var entityEntry in entries)
             {
+                var utcNow = DateTime.UtcNow;
                 if (entityEntry.State == EntityState.Added)
                 {
-                    ((BaseTransactionModel)entityEntry.Entity).CreatedAt = DateTime.UtcNow;
+                    ((BaseTransactionModel)entityEntry.Entity).CreatedAt = utcNow;
                     ((BaseTransactionModel)entityEntry.Entity).CreatedBy = _httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "MyApp";
                 }
                 else
@@ -45,7 +46,7 @@ namespace Phonebook.Data
                     Entry((BaseTransactionModel)entityEntry.Entity).Property(p => p.CreatedBy).IsModified = false;
                 }
 
-                ((BaseTransactionModel)entityEntry.Entity).ModifiedAt = DateTime.UtcNow;
+                ((BaseTransactionModel)entityEntry.Entity).ModifiedAt = utcNow;
                 ((BaseTransactionModel)entityEntry.Entity).ModifiedBy = _httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "MyApp";
             }
 
