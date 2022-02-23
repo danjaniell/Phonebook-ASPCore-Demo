@@ -10,6 +10,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Phonebook.Data;
+using FluentValidation.AspNetCore;
+using FluentValidation;
+using Phonebook.Validators;
+using Phonebook.Models;
 
 namespace Phonebook
 {
@@ -29,6 +33,8 @@ namespace Phonebook
             services.AddDatabaseDeveloperPageExceptionFilter();
             services.AddHttpContextAccessor();
             services.AddControllersWithViews();
+            services.AddFluentValidation();
+            services.AddTransient<IValidator<Contact>, ContactValidator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
