@@ -14,6 +14,12 @@ namespace Phonebook.Data.Repositories
 
         public void CreateContact(Contact contact) => Create(contact);
 
+        public void DeleteContact(Contact contact) => Delete(contact);
+
         public IEnumerable<Contact> GetAllContacts(bool trackChanges) => FindAll(trackChanges).OrderBy(x => x.LastName).ToList();
+
+        public Contact GetById(int id, bool trackChanges) => FindByCondition((x) => x.Id == id, trackChanges).SingleOrDefault();
+
+        public void UpdateContact(Contact contact) => Update(contact);
     }
 }
