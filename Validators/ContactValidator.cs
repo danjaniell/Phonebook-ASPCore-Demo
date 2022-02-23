@@ -10,7 +10,7 @@ namespace Phonebook.Validators
         {
             RuleFor(x => x.FirstName).NotEmpty().NotNull().MaximumLength(55).WithMessage("Please specify first name");
             RuleFor(x => x.LastName).NotEmpty().NotNull().MaximumLength(55).WithMessage("Please specify last name");
-            RuleFor(x => x.Email).EmailAddress().WithMessage("Not a valid email address");
+            RuleFor(x => x.Email).NotEmpty().NotNull().EmailAddress().WithMessage("Not a valid email address");
             RuleFor(x => x.Mobile).Must(BeAValidMobileNum).WithMessage("Not a valid mobile number");
         }
 
