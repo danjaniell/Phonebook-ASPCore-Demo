@@ -5,21 +5,22 @@ using System.Threading.Tasks;
 using Phonebook.Models;
 using System;
 using System.Linq;
+using Phonebook.Data.Repositories.Base;
 
 namespace Phonebook.Controllers
 {
     public class ContactsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IRepositoryManager _repository;
 
-        public ContactsController(ApplicationDbContext context)
+        public ContactsController(IRepositoryManager repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var contacts = await _context.Contacts.ToListAsync();
+            var contacts = _repository.Contacts.GetAllContacts(trackChanges: false);
             return View(contacts);
         }
 
@@ -30,14 +31,14 @@ namespace Phonebook.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Contact contact)
+        public IActionResult Create(Contact contact)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Add(contact);
-                    await _context.SaveChangesAsync();
+                    _repository.Contacts.CreateContact(contact);
+                    _repository.Save();
 
                     return RedirectToAction("Index");
                 }
@@ -53,30 +54,26 @@ namespace Phonebook.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(int id)
+        public IActionResult Edit(int id)
         {
-            var exist = await _context.Contacts.Where(x => x.Id == id).FirstOrDefaultAsync();
+            var exist = _repository.Contacts.GetById(id, trackChanges: false);
 
             return View(exist);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(Contact request)
+        public IActionResult Edit(Contact request)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var exist = await _context.Contacts.Where(x => x.Id == request.Id).FirstOrDefaultAsync();
+                    var exist = _repository.Contacts.GetById(request.Id, trackChanges: false);
 
                     if (exist is not null)
                     {
-                        exist.FirstName = request.FirstName;
-                        exist.LastName = request.LastName;
-                        exist.Mobile = request.Mobile;
-                        exist.Email = request.Email;
-
-                        await _context.SaveChangesAsync();
+                        _repository.Contacts.UpdateContact(request);
+                        _repository.Save();
                         return RedirectToAction("Index");
                     }
                 }
@@ -92,26 +89,26 @@ namespace Phonebook.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Delete(int id)
+        public IActionResult Delete(int id)
         {
-            var exist = await _context.Contacts.Where(x => x.Id == id).FirstOrDefaultAsync();
+            var exist = _repository.Contacts.GetById(id, trackChanges: false);
 
             return View(exist);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(Contact request)
+        public IActionResult Delete(Contact request)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var exist = _context.Contacts.Where(x => x.Id == request.Id).FirstOrDefault();
+                    var exist = _repository.Contacts.GetById(request.Id, trackChanges: false);
 
                     if (exist != null)
                     {
-                        _context.Remove(exist);
-                        await _context.SaveChangesAsync();
+                        _repository.Contacts.DeleteContact(request);
+                        _repository.Save();
 
                         return RedirectToAction("Index");
                     }
