@@ -90,5 +90,41 @@ namespace Phonebook.Controllers
 
             return View(request);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var exist = await _context.Contacts.Where(x => x.Id == id).FirstOrDefaultAsync();
+
+            return View(exist);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(Contact request)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var exist = _context.Contacts.Where(x => x.Id == request.Id).FirstOrDefault();
+
+                    if (exist != null)
+                    {
+                        _context.Remove(exist);
+                        await _context.SaveChangesAsync();
+
+                        return RedirectToAction("Index");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, $"Something went wrong {ex.Message}");
+                }
+            }
+
+            ModelState.AddModelError(string.Empty, "Something went wrong, invalid model");
+
+            return View();
+        }
     }
 }
