@@ -25,6 +25,34 @@ namespace Phonebook.Data
             base.OnModelCreating(modelBuilder);
         }
 
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            var entries = ChangeTracker.Entries()
+                                       .Where(e => e.Entity is BaseTransactionModel &&
+                                                  (e.State == EntityState.Added ||
+                                                   e.State == EntityState.Modified));
+
+            foreach (var entityEntry in entries)
+            {
+                var utcNow = DateTime.UtcNow;
+                if (entityEntry.State == EntityState.Added)
+                {
+                    ((BaseTransactionModel)entityEntry.Entity).CreatedAt = utcNow;
+                    ((BaseTransactionModel)entityEntry.Entity).CreatedBy = _httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "MyApp";
+                }
+                else
+                {
+                    Entry((BaseTransactionModel)entityEntry.Entity).Property(p => p.CreatedAt).IsModified = false;
+                    Entry((BaseTransactionModel)entityEntry.Entity).Property(p => p.CreatedBy).IsModified = false;
+                }
+
+                ((BaseTransactionModel)entityEntry.Entity).ModifiedAt = utcNow;
+                ((BaseTransactionModel)entityEntry.Entity).ModifiedBy = _httpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "MyApp";
+            }
+
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
         public async override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             var entries = ChangeTracker.Entries()
