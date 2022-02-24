@@ -5,6 +5,7 @@ using Phonebook.Models;
 using System.Linq;
 using System;
 using Microsoft.AspNetCore.Http;
+using Bogus;
 
 namespace Phonebook.Data
 {
@@ -22,6 +23,21 @@ namespace Phonebook.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            var ids = 1;
+            var contacts = new Faker<Contact>()
+                .RuleFor(m => m.Id, f => ids++)
+                .RuleFor(m => m.FirstName, f => f.Person.FirstName)
+                .RuleFor(m => m.LastName, f => f.Person.LastName)
+                .RuleFor(m => m.Email, f => f.Person.Email)
+                .RuleFor(m => m.Mobile, f => f.Random.ReplaceNumbers("+639#########"))
+                .RuleFor(m => m.CreatedBy, f => f.Hacker.Noun())
+                .RuleFor(m => m.ModifiedBy, f => f.Hacker.Noun())
+                .RuleFor(m => m.CreatedAt, f => f.Date.Past())
+                .RuleFor(m => m.ModifiedAt, f => f.Date.Recent(days: 60));
+            modelBuilder
+                .Entity<Contact>()
+                .HasData(contacts.GenerateBetween(2000, 2500));
+
             base.OnModelCreating(modelBuilder);
         }
 
