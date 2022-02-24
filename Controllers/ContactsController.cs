@@ -6,6 +6,7 @@ using Phonebook.Models;
 using System;
 using System.Linq;
 using Phonebook.Data.Repositories.Base;
+using Phonebook.Common;
 
 namespace Phonebook.Controllers
 {
@@ -18,12 +19,17 @@ namespace Phonebook.Controllers
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        public async Task<IActionResult> Index(string sortOrder, string searchString)
+        public async Task<IActionResult> Index(string sortOrder, string searchString, string currentFilter, int? pageNum)
         {
+            ViewData["CurrentSort"] = sortOrder;
             ViewData["FNameSortParm"] = sortOrder == "fname_asc" ? "fname_desc" : "fname_asc";
             ViewData["LNameSortParm"] = sortOrder == "lname_asc" ? "lname_desc" : "lname_asc";
             ViewData["EmailSortParm"] = sortOrder == "email_asc" ? "email_desc" : "email_asc";
             ViewData["MobileSortParm"] = sortOrder == "mobile_asc" ? "mobile_desc" : "mobile_asc";
+
+            if (searchString is null) { pageNum = 1; }
+            searchString = currentFilter;
+
             ViewData["CurrentFilter"] = searchString;
 
             var contacts = await _repository.Contacts.GetAllContacts(trackChanges: false);
@@ -47,7 +53,9 @@ namespace Phonebook.Controllers
                 _ => contacts.OrderBy(s => s.Id),
             };
 
-            return View(contacts);
+            const int pageSize = 25;
+
+            return View(PaginatedList<Contact>.Create(contacts, pageNum ?? 1, pageSize));
         }
 
         [HttpGet]
