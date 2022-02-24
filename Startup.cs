@@ -16,6 +16,9 @@ using Phonebook.Validators;
 using Phonebook.Models;
 using Phonebook.Data.Repositories.Base;
 using Phonebook.Data.Repositories;
+using Phonebook.Services.Base;
+using Phonebook.Services;
+using StackExchange.Redis;
 
 namespace Phonebook
 {
@@ -39,10 +42,20 @@ namespace Phonebook
             services.AddTransient<IValidator<Contact>, ContactValidator>();
             services.AddScoped<IRepositoryManager, RepositoryManager>();
             services.AddDistributedRedisCache(options =>
-            {
-                options.Configuration = Configuration.GetConnectionString("Redis");
-                options.InstanceName = Configuration["Redis:InstanceName"];
-            });
+             {
+                 options.InstanceName = Configuration["Redis:InstanceName"];
+                 options.ConfigurationOptions = new ConfigurationOptions()
+                 {
+                     EndPoints = { { Configuration.GetConnectionString("Redis"), int.Parse(Configuration["Redis:Port"]) } },
+                     ConnectRetry = 2,
+                     ReconnectRetryPolicy = new LinearRetry(10),
+                     AbortOnConnectFail = false,
+                     ConnectTimeout = 5000,
+                     SyncTimeout = 1000,
+                     DefaultDatabase = 0,
+                 };
+             });
+            services.AddScoped<ICacheService<Contact>, ContactsCacheService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
