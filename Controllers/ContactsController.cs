@@ -18,9 +18,9 @@ namespace Phonebook.Controllers
             _repository = repository;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var contacts = _repository.Contacts.GetAllContacts(trackChanges: false);
+            var contacts = await _repository.Contacts.GetAllContacts(trackChanges: false);
             return View(contacts);
         }
 
@@ -31,14 +31,14 @@ namespace Phonebook.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(Contact contact)
+        public async Task<IActionResult> Create(Contact contact)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _repository.Contacts.CreateContact(contact);
-                    _repository.Save();
+                    await _repository.Contacts.CreateContact(contact);
+                    await _repository.SaveAsync();
 
                     return RedirectToAction("Index");
                 }
@@ -54,26 +54,26 @@ namespace Phonebook.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            var exist = _repository.Contacts.GetById(id, trackChanges: false);
+            var exist = await _repository.Contacts.GetById(id, trackChanges: false);
 
             return View(exist);
         }
 
         [HttpPost]
-        public IActionResult Edit(Contact request)
+        public async Task<IActionResult> Edit(Contact request)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var exist = _repository.Contacts.GetById(request.Id, trackChanges: false);
+                    var exist = await _repository.Contacts.GetById(request.Id, trackChanges: false);
 
                     if (exist is not null)
                     {
                         _repository.Contacts.UpdateContact(request);
-                        _repository.Save();
+                        await _repository.SaveAsync();
                         return RedirectToAction("Index");
                     }
                 }
@@ -89,26 +89,26 @@ namespace Phonebook.Controllers
         }
 
         [HttpGet]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var exist = _repository.Contacts.GetById(id, trackChanges: false);
+            var exist = await _repository.Contacts.GetById(id, trackChanges: false);
 
             return View(exist);
         }
 
         [HttpPost]
-        public IActionResult Delete(Contact request)
+        public async Task<IActionResult> Delete(Contact request)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var exist = _repository.Contacts.GetById(request.Id, trackChanges: false);
+                    var exist = await _repository.Contacts.GetById(request.Id, trackChanges: false);
 
                     if (exist != null)
                     {
                         _repository.Contacts.DeleteContact(request);
-                        _repository.Save();
+                        await _repository.SaveAsync();
 
                         return RedirectToAction("Index");
                     }
