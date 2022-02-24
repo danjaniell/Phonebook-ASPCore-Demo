@@ -18,14 +18,21 @@ namespace Phonebook.Controllers
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        public async Task<IActionResult> Index(string sortOrder)
+        public async Task<IActionResult> Index(string sortOrder, string searchString)
         {
             ViewData["FNameSortParm"] = sortOrder == "fname_asc" ? "fname_desc" : "fname_asc";
             ViewData["LNameSortParm"] = sortOrder == "lname_asc" ? "lname_desc" : "lname_asc";
             ViewData["EmailSortParm"] = sortOrder == "email_asc" ? "email_desc" : "email_asc";
             ViewData["MobileSortParm"] = sortOrder == "mobile_asc" ? "mobile_desc" : "mobile_asc";
+            ViewData["CurrentFilter"] = searchString;
 
             var contacts = await _repository.Contacts.GetAllContacts(trackChanges: false);
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                contacts = contacts.Where(s => s.LastName.Contains(searchString) ||
+                                               s.FirstName.Contains(searchString));
+            }
 
             contacts = sortOrder switch
             {
