@@ -5,13 +5,17 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Phonebook.Data.Repositories.Base;
 using Phonebook.Models;
+using Phonebook.Services.Base;
 
 namespace Phonebook.Data.Repositories
 {
     public class ContactsRepository : RepositoryBase<Contact>, IContactsRepository
     {
-        public ContactsRepository(ApplicationDbContext context) : base(context)
+        private readonly ICacheService<Contact> _contactsCacheService;
+
+        public ContactsRepository(ApplicationDbContext context, ICacheService<Contact> contactsCacheService) : base(context)
         {
+            _contactsCacheService = contactsCacheService ?? throw new ArgumentNullException(nameof(contactsCacheService));
         }
 
         public async Task CreateContact(Contact contact) => await Create(contact);
