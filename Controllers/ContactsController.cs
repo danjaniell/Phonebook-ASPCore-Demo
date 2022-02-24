@@ -27,8 +27,8 @@ namespace Phonebook.Controllers
             ViewData["EmailSortParm"] = sortOrder == "email_asc" ? "email_desc" : "email_asc";
             ViewData["MobileSortParm"] = sortOrder == "mobile_asc" ? "mobile_desc" : "mobile_asc";
 
-            if (searchString is null) { pageNum = 1; }
-            searchString = currentFilter;
+            if (searchString is not null) { pageNum = 1; }
+            else { searchString = currentFilter; }
 
             ViewData["CurrentFilter"] = searchString;
 
