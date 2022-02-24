@@ -38,6 +38,11 @@ namespace Phonebook
             services.AddFluentValidation();
             services.AddTransient<IValidator<Contact>, ContactValidator>();
             services.AddScoped<IRepositoryManager, RepositoryManager>();
+            services.AddDistributedRedisCache(options =>
+            {
+                options.Configuration = Configuration.GetConnectionString("Redis");
+                options.InstanceName = Configuration["Redis:InstanceName"];
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
