@@ -24,7 +24,18 @@ namespace Phonebook.Data.Repositories
 
         public async Task<IEnumerable<Contact>> GetAllContacts(bool trackChanges) => await FindAll(trackChanges).OrderBy(x => x.LastName).ToListAsync();
 
-        public async Task<Contact> GetById(int id, bool trackChanges) => await FindByCondition((x) => x.Id == id, trackChanges).SingleOrDefaultAsync();
+        public async Task<Contact> GetById(int id, bool trackChanges)
+        {
+            var contact = await _contactsCacheService.Get(id);
+
+            if (contact is null)
+            {
+                contact = await FindByCondition((x) => x.Id == id, trackChanges).SingleOrDefaultAsync();
+                await _contactsCacheService.Set(contact);
+            }
+
+            return contact;
+        }
 
         public void UpdateContact(Contact contact) => Update(contact);
     }
