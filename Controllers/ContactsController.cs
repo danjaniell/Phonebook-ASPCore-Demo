@@ -18,9 +18,28 @@ namespace Phonebook.Controllers
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder)
         {
+            ViewData["FNameSortParm"] = sortOrder == "fname_asc" ? "fname_desc" : "fname_asc";
+            ViewData["LNameSortParm"] = sortOrder == "lname_asc" ? "lname_desc" : "lname_asc";
+            ViewData["EmailSortParm"] = sortOrder == "email_asc" ? "email_desc" : "email_asc";
+            ViewData["MobileSortParm"] = sortOrder == "mobile_asc" ? "mobile_desc" : "mobile_asc";
+
             var contacts = await _repository.Contacts.GetAllContacts(trackChanges: false);
+
+            contacts = sortOrder switch
+            {
+                "fname_asc" => contacts.OrderBy(s => s.FirstName),
+                "fname_desc" => contacts.OrderByDescending(s => s.FirstName),
+                "lname_asc" => contacts.OrderBy(s => s.LastName),
+                "lname_desc" => contacts.OrderByDescending(s => s.LastName),
+                "email_asc" => contacts.OrderBy(s => s.Email),
+                "email_desc" => contacts.OrderByDescending(s => s.Email),
+                "mobile_asc" => contacts.OrderBy(s => s.Mobile),
+                "mobile_desc" => contacts.OrderByDescending(s => s.Mobile),
+                _ => contacts.OrderBy(s => s.Id),
+            };
+
             return View(contacts);
         }
 

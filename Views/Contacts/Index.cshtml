@@ -11,10 +11,18 @@
         <table class="table">
             <thead>
                 <tr>
-                    <td>First Name</td>
-                    <td>Last Name</td>
-                    <td>Email</td>
-                    <td>Mobile Number</td>
+                    <td> <a asp-action="Index"
+                            asp-route-sortOrder="@ViewData["FNameSortParm"]">@Html.DisplayNameFor(model =>
+                            model.FirstName)</a></td>
+                    <td> <a asp-action="Index"
+                            asp-route-sortOrder="@ViewData["LNameSortParm"]">@Html.DisplayNameFor(model =>
+                            model.LastName)</a></td>
+                    <td> <a asp-action="Index"
+                            asp-route-sortOrder="@ViewData["EmailSortParm"]">@Html.DisplayNameFor(model =>
+                            model.Email)</a></td>
+                    <td><a asp-action="Index"
+                            asp-route-sortOrder="@ViewData["MobileSortParm"]">@Html.DisplayNameFor(model =>
+                            model.Mobile)</a></td>
                     <td>Manage</td>
                 </tr>
             </thead>
